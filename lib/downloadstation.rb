@@ -93,7 +93,15 @@ module SynologyApi
         raise exception
       end
       
-      response.error! if not response.is_a? Net::HTTPSuccess
+      if not response.is_a? Net::HTTPSuccess
+        begin
+          response.error!
+        rescue => x
+          exception = HttpError.new("Can't talk with server: #{x.message}")
+          exception.inner_exception = x
+          raise exception
+        end
+      end
       
       result = JSON.parse(response.body)
       # TODO: be more specific
