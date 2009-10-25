@@ -151,5 +151,7 @@ module SynologyApi
     attr_accessor :inner_exception
   end
   
+  class HttpError < NetworkError; end
+  
   class LoginFailedError < DownloadStationError; end
 end
