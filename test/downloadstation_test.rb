@@ -121,9 +121,12 @@ class ConnectionTest < Test::Unit::TestCase
       connection = Connection.new('109.199.202.40', @port, @user, @password)
     }
     
-    assert_raise(NetworkError) {
+    begin
       connection.send({'baz' => 'qux'}, false)
-    }
+    rescue => x
+      assert_kind_of(NetworkError, x)
+      assert(!x.is_a?(HttpError))
+    end
   end
   
   def test_send_with_bad_port
@@ -133,9 +136,12 @@ class ConnectionTest < Test::Unit::TestCase
       connection = Connection.new(@address, 45150, @user, @password)
     }
     
-    assert_raise(NetworkError) {
+    begin
       connection.send({'quux' => 'corge'}, false)
-    }
+    rescue => x
+      assert_kind_of(NetworkError, x)
+      assert(!x.is_a?(HttpError))
+    end
   end
   
   def test_login
