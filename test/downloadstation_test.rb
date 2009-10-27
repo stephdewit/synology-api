@@ -147,9 +147,14 @@ class ConnectionTest < Test::Unit::TestCase
   end
   
   def test_login
+    connection = nil
+    
     assert_nothing_thrown {
-      get_connection().login
+      connection = get_connection()
+      connection.login
     }
+    
+    assert connection.is_connected?
   end
   
   def test_login_with_bad_user
@@ -161,6 +166,8 @@ class ConnectionTest < Test::Unit::TestCase
     assert_raise(LoginFailedError) {
       connection.login
     }
+    
+    assert !connection.is_connected?
   end
   
   def test_login_with_bad_password
@@ -172,6 +179,8 @@ class ConnectionTest < Test::Unit::TestCase
     assert_raise(LoginFailedError) {
       connection.login
     }
+    
+    assert !connection.is_connected?
   end
 
 end
