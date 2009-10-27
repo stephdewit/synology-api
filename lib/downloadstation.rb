@@ -114,7 +114,7 @@ module SynologyApi
     # Couldn't find a gem which handles multipart POSTs correctly
     # Why the hell can't Net::HTTP do that ??!?
     def upload_torrent_file(file)
-      curl_stdout = `curl -F "id=#{@id}" -F "torrent=@#{file}" http://#{@connection.address}:#{@connection.port}#{DOWNLOADREDIRECTOR_PATH}`
+      curl_stdout = `curl -F "id=#{@token}" -F "torrent=@#{file}" http://#{@connection.address}:#{@connection.port}#{DOWNLOADREDIRECTOR_PATH}`
       
       JSON.parse(curlStdOut)
     end
