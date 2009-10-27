@@ -115,6 +115,8 @@ class ConnectionTest < Test::Unit::TestCase
   end
   
   def test_send_with_bad_address
+    return if ENV['SKIP_SLOW_TESTS'] == '1'
+    
     connection = nil
     assert_nothing_thrown {
       # I hope this IP address isn't used...
