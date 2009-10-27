@@ -114,7 +114,7 @@ class ConnectionTest < Test::Unit::TestCase
     }
   end
   
-  def test_send_with_bad_address
+  def test_send_with_bad_ip_address
     return if ENV['SKIP_SLOW_TESTS'] == '1'
     
     connection = nil
@@ -125,6 +125,21 @@ class ConnectionTest < Test::Unit::TestCase
     
     begin
       connection.send({'baz' => 'qux'}, false)
+    rescue => x
+      assert_kind_of(NetworkError, x)
+      assert(!x.is_a?(HttpError))
+    end
+  end
+  
+  def test_send_with_bad_dns_address
+    connection = nil
+    assert_nothing_thrown {
+      # I hope this domain doesn't exist...
+      connection = Connection.new('waldo.fred', @port, @user, @password)
+    }
+    
+    begin
+      connection.send({'plugh' => 'xyzzy'}, false)
     rescue => x
       assert_kind_of(NetworkError, x)
       assert(!x.is_a?(HttpError))

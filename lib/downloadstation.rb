@@ -87,7 +87,7 @@ module SynologyApi
       
       begin
         response = @http.start { |h| h.request(request) }
-      rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT => x
+      rescue SocketError, Errno::ECONNREFUSED, Errno::ETIMEDOUT => x
         exception = NetworkError.new("Can't connect to server: #{x.message}")
         exception.inner_exception = x
         raise exception
