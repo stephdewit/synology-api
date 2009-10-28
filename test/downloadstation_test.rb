@@ -114,20 +114,20 @@ class ConnectionTest < Test::Unit::TestCase
     }
   end
   
-  def test_send_with_bad_ip_address
-    return if ENV['SKIP_SLOW_TESTS'] == '1'
+  if ENV['SKIP_SLOW_TESTS'] != '1'
+    def test_send_with_bad_ip_address
+      connection = nil
+      assert_nothing_thrown {
+        # I hope this IP address isn't used...
+        connection = Connection.new('109.199.202.40', @port, @user, @password)
+      }
     
-    connection = nil
-    assert_nothing_thrown {
-      # I hope this IP address isn't used...
-      connection = Connection.new('109.199.202.40', @port, @user, @password)
-    }
-    
-    begin
-      connection.send({'baz' => 'qux'}, false)
-    rescue => x
-      assert_kind_of(NetworkError, x)
-      assert(!x.is_a?(HttpError))
+      begin
+        connection.send({'baz' => 'qux'}, false)
+      rescue => x
+        assert_kind_of(NetworkError, x)
+        assert(!x.is_a?(HttpError))
+      end
     end
   end
   
