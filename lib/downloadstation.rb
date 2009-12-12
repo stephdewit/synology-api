@@ -120,30 +120,6 @@ module SynologyApi
     end
     
   end
-  
-  class Command
-    
-    def execute(connection)
-      
-    end
-    
-  end
-
-  class LoginCommand < Command
-
-  end
-
-  class AuthentifiedCommand < Command
-
-  end
-
-  class ActionCommand < AuthentifiedCommand
-
-  end
-  
-  class UploadCommand < AuthentifiedCommand
-
-  end
 
   class DownloadStationError < StandardError; end
   
