@@ -112,7 +112,7 @@ module SynologyApi
     def upload_torrent_file(file)
       login if (!is_connected?)
       
-      curl_stdout = `curl -F "id=#{@token}" -F "torrent=@#{file}" http://#{@connection.address}:#{@connection.port}#{DOWNLOADREDIRECTOR_PATH}`
+      curl_stdout = `curl -F "id=#{@token}" -F "torrent=@#{file}" http://#{address}:#{port}#{DOWNLOADREDIRECTOR_PATH}`
       
       treat_response(curl_stdout)
     end
