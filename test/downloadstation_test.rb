@@ -6,6 +6,9 @@ include SynologyApi
 
 class ConnectionTest < Test::Unit::TestCase
 
+  skip_slow_tests = ENV['SKIP_SLOW_TESTS'] == '1'
+  my_dns_sucks = ENV['MY_DNS_SUCKS'] == '1'
+  
   EMPTY_STRINGS = ['', '   ', "\n \t"]
   
   def setup
@@ -114,7 +117,7 @@ class ConnectionTest < Test::Unit::TestCase
     }
   end
   
-  if ENV['SKIP_SLOW_TESTS'] != '1'
+  unless skip_slow_tests
     def test_send_with_bad_ip_address
       connection = nil
       assert_nothing_thrown {
@@ -133,20 +136,22 @@ class ConnectionTest < Test::Unit::TestCase
     end
   end
   
-  def test_send_with_bad_dns_address
-    connection = nil
-    assert_nothing_thrown {
-      # I hope this domain doesn't exist...
-      connection = Connection.new('waldo.fred', @port, @user, @password)
-    }
+  unless my_dns_sucks
+    def test_send_with_bad_dns_address
+      connection = nil
+      assert_nothing_thrown {
+        # I hope this domain doesn't exist...
+        connection = Connection.new('waldo.fred', @port, @user, @password)
+      }
     
-    begin
-      connection.send({'plugh' => 'xyzzy'}, false)
-    rescue => x
-      assert_kind_of(NetworkError, x)
-      assert(!x.is_a?(HttpError))
-      assert_kind_of(SocketError, x.inner_exception)
-      assert_equal(:dns, x.possible_cause)
+      begin
+        connection.send({'plugh' => 'xyzzy'}, false)
+      rescue => x
+        assert_kind_of(NetworkError, x)
+        assert(!x.is_a?(HttpError))
+        assert_kind_of(SocketError, x.inner_exception)
+        assert_equal(:dns, x.possible_cause)
+      end
     end
   end
   
