@@ -103,31 +103,59 @@ module SynologyApi
         end
       end
       
-      result = JSON.parse(response.body)
-      # TODO: be more specific
-      raise DownloadStationError.new('Something went wrong while processing query') unless result['success']
-      
-      result
+      treat_response(response.body)
     end
     
     # FIXME
     # Couldn't find a gem which handles multipart POSTs correctly
     # Why the hell can't Net::HTTP do that ??!?
     def upload_torrent_file(file)
+      login if (!is_connected?)
+      
       curl_stdout = `curl -F "id=#{@token}" -F "torrent=@#{file}" http://#{@connection.address}:#{@connection.port}#{DOWNLOADREDIRECTOR_PATH}`
       
-      JSON.parse(curlStdOut)
+      treat_response(curl_stdout)
     end
+    
+    def treat_response(response_body)
+      result = JSON.parse(response_body)
+      # TODO: be more specific
+      raise DownloadStationError.new('Something went wrong while processing query') unless result['success']
+      
+      result
+    end
+    
+    private :treat_response
     
   end
 
   class DownloadStationError < StandardError; end
   
   class NetworkError < DownloadStationError
+    
     attr_accessor :inner_exception
+    
+    # Best effort...
+    def possible_cause
+      return nil if (@inner_exception == nil)
+      
+      case @inner_exception
+        when SocketError: :dns
+        when Errno::ECONNREFUSED: :port
+        when Errno::ETIMEDOUT: :ip_or_firewall
+        else nil
+      end
+    end
+    
   end
   
-  class HttpError < NetworkError; end
+  class HttpError < NetworkError
+    
+    def possible_cause
+      :protocol
+    end
+    
+  end
   
   class LoginFailedError < DownloadStationError; end
 end

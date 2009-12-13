@@ -127,6 +127,8 @@ class ConnectionTest < Test::Unit::TestCase
       rescue => x
         assert_kind_of(NetworkError, x)
         assert(!x.is_a?(HttpError))
+        assert_kind_of(Errno::ETIMEDOUT, x.inner_exception)
+        assert_equal(:ip_or_firewall, x.possible_cause)
       end
     end
   end
@@ -143,6 +145,8 @@ class ConnectionTest < Test::Unit::TestCase
     rescue => x
       assert_kind_of(NetworkError, x)
       assert(!x.is_a?(HttpError))
+      assert_kind_of(SocketError, x.inner_exception)
+      assert_equal(:dns, x.possible_cause)
     end
   end
   
@@ -158,6 +162,8 @@ class ConnectionTest < Test::Unit::TestCase
     rescue => x
       assert_kind_of(NetworkError, x)
       assert(!x.is_a?(HttpError))
+      assert_kind_of(Errno::ECONNREFUSED, x.inner_exception)
+      assert_equal(:port, x.possible_cause)
     end
   end
   
