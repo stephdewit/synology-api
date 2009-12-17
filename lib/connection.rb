@@ -114,7 +114,7 @@ module SynologyApi
     def treat_response(response_body)
       result = JSON.parse(response_body)
       # TODO: be more specific
-      raise DownloadStationError.new('Something went wrong while processing query') unless result['success']
+      raise SynologyApiError.new('Something went wrong while processing query') unless result['success']
       
       result
     end

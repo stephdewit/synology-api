@@ -117,6 +117,20 @@ class ConnectionTest < Test::Unit::TestCase
     }
   end
   
+  def test_send_junk_data
+    begin
+      get_connection().send({'thud' => 'foo'}, false)
+    rescue => x
+      assert_kind_of(SynologyApiError, x)
+    end
+  end
+  
+  def test_send_bad_command
+    assert_raise(SynologyApiError) {
+      get_connection().send({'action' => 'addurl', 'url' => 'bar'}, false)
+    }
+  end
+  
   unless skip_slow_tests
     def test_send_with_bad_ip_address
       connection = nil
