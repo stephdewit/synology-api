@@ -35,6 +35,10 @@ class DownloadStationTest < Test::Unit::TestCase
     assert_not_nil(job)
     assert_equal(qux_value, job.qux)
     assert_equal(corge_value, job.corge)
+    
+    assert_raise(NoMethodError) {
+      job.garply
+    }
   end
   
   def test_initialize_job_with_nil_data
