@@ -1,25 +1,16 @@
 require 'test/unit'
+
+require File.join(File.dirname(__FILE__), 'synologyapitest')
 require File.join(File.dirname(__FILE__), '../lib/downloadstation.rb')
-require 'yaml'
 
 include SynologyApi
 
 class ConnectionTest < Test::Unit::TestCase
-
+  
+  include SynologyApiTest
+  
   skip_slow_tests = ENV['SKIP_SLOW_TESTS'] == '1'
   my_dns_sucks = ENV['MY_DNS_SUCKS'] == '1'
-  
-  EMPTY_STRINGS = ['', '   ', "\n \t"]
-  
-  def setup
-    config_file_path = File.join(File.dirname(__FILE__), 'config.yaml')
-    settings = YAML::load_file(config_file_path)
-    
-    @address = settings['address']
-    @port = settings['port']
-    @user = settings['user']
-    @password = settings['password']
-  end
   
   def get_connection
     Connection.new(@address, @port, @user, @password)
