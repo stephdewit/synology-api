@@ -30,6 +30,10 @@ module SynologyApi
         
         @connection.send('action' => 'addurl', 'url' => cleaned_url)
       end
+      
+      def clear
+        @connection.send('action' => 'clear')
+      end
     
     end
     

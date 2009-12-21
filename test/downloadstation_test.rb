@@ -74,7 +74,7 @@ class DownloadStationTest < Test::Unit::TestCase
   def test_create_job_by_url
     downloadstation = get_downloadstation()
     assert_nothing_thrown {
-      job = downloadstation.add_url(TEST_URL)
+      downloadstation.add_url(TEST_URL)
     }
     
     assert(downloadstation.jobs.any? { |j| j.url == TEST_URL})
@@ -107,6 +107,33 @@ class DownloadStationTest < Test::Unit::TestCase
     assert_raise(TypeError) {
       get_downloadstation().add_url([])
     }
+  end
+  
+  def test_clear
+    downloadstation = get_downloadstation()
+    completed_status_value = 5
+    
+    downloadstation.add_url(TEST_URL) if downloadstation.jobs.none? { |j| j.status == completed_status_value }
+    i = 0
+    max_retries = 10
+    while i < max_retries && downloadstation.jobs.none? { |j| j.status == completed_status_value } do
+      Kernel.sleep 3
+      i = i + 1
+    end
+    
+    raise 'Can''t complete a download' if i == max_retries
+    
+    before = downloadstation.jobs
+    
+    assert_nothing_thrown {
+      downloadstation.clear
+    }
+    
+    after = downloadstation.jobs
+    
+    assert(after.count < before.count)
+    assert(before.any? { |j| j.status == completed_status_value })
+    assert(after.none? { |j| j.status == completed_status_value })
   end
   
 end
