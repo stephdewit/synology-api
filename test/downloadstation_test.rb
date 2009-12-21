@@ -18,7 +18,7 @@ class DownloadStationTest < Test::Unit::TestCase
   def test_initialize
     downloadstation = nil
     assert_nothing_thrown {
-      downloadstation = get_downloadstation
+      downloadstation = get_downloadstation()
     }
     
     assert_not_nil(downloadstation)
@@ -67,6 +67,46 @@ class DownloadStationTest < Test::Unit::TestCase
     
     assert_not_nil(jobs)
     assert_kind_of(Array, jobs)
+  end
+  
+  TEST_URL = 'http://www.google.com/favicon.ico'
+  
+  def test_create_job_by_url
+    downloadstation = get_downloadstation()
+    assert_nothing_thrown {
+      job = downloadstation.add_url(TEST_URL)
+    }
+    
+    assert(downloadstation.jobs.any? { |j| j.url == TEST_URL})
+  end
+  
+  def test_create_job_with_dirty_url
+    downloadstation = get_downloadstation()
+    assert_nothing_thrown {
+      job = downloadstation.add_url("  \n\r#{TEST_URL}\t\t\n")
+    }
+    
+    assert(downloadstation.jobs.any? { |j| j.url == TEST_URL})
+  end
+  
+  def test_create_job_with_nil_url
+    assert_raise(ArgumentError) {
+      get_downloadstation().add_url(nil)
+    }
+  end
+  
+  def test_create_job_with_empty_url
+    EMPTY_STRINGS.each { |s|
+      assert_raise(ArgumentError) {
+        get_downloadstation().add_url(s)
+      }
+    }
+  end
+  
+  def test_create_job_with_not_string_url
+    assert_raise(TypeError) {
+      get_downloadstation().add_url([])
+    }
   end
   
 end

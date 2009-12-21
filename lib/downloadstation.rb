@@ -20,6 +20,16 @@ module SynologyApi
           []
         end
       end
+      
+      def add_url(url)
+        raise ArgumentError.new("Not nil 'url' argument expected") if url == nil
+        raise TypeError.new("String 'url' argument expected") if not url.is_a? String
+        
+        cleaned_url = url.strip
+        raise ArgumentError.new("Not empty 'url' argument expected") if cleaned_url.empty?
+        
+        @connection.send('action' => 'addurl', 'url' => cleaned_url)
+      end
     
     end
     
