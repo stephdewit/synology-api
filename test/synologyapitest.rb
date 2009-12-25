@@ -12,6 +12,9 @@ module SynologyApiTest
     @port = settings['port']
     @user = settings['user']
     @password = settings['password']
+    
+    @small_file_url = settings['testurls']['smallfile']
+    @large_file_url = settings['testurls']['largefile']
   end
   
 end

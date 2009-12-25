@@ -3,3 +3,7 @@ address: butters.lan
 port: 5000
 user: apitest
 password: apipasswd
+
+testurls:
+    smallfile: http://www.google.com/favicon.ico
+    largefile: http://cache.pack.google.com/edgedl/chrome/mac/googlechrome-4.0.249.30-beta.dmg

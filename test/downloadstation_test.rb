@@ -69,24 +69,22 @@ class DownloadStationTest < Test::Unit::TestCase
     assert_kind_of(Array, jobs)
   end
   
-  TEST_URL = 'http://www.google.com/favicon.ico'
-  
   def test_create_job_by_url
     downloadstation = get_downloadstation()
     assert_nothing_thrown {
-      downloadstation.add_url(TEST_URL)
+      downloadstation.add_url(@small_file_url)
     }
     
-    assert(downloadstation.jobs.any? { |j| j.url == TEST_URL})
+    assert(downloadstation.jobs.any? { |j| j.url == @small_file_url})
   end
   
   def test_create_job_with_dirty_url
     downloadstation = get_downloadstation()
     assert_nothing_thrown {
-      job = downloadstation.add_url("  \n\r#{TEST_URL}\t\t\n")
+      job = downloadstation.add_url("  \n\r#{@small_file_url}\t\t\n")
     }
     
-    assert(downloadstation.jobs.any? { |j| j.url == TEST_URL})
+    assert(downloadstation.jobs.any? { |j| j.url == @small_file_url})
   end
   
   def test_create_job_with_nil_url
@@ -113,7 +111,7 @@ class DownloadStationTest < Test::Unit::TestCase
     downloadstation = get_downloadstation()
     completed_status_value = 5
     
-    downloadstation.add_url(TEST_URL) if downloadstation.jobs.none? { |j| j.status == completed_status_value }
+    downloadstation.add_url(@small_file_url) if downloadstation.jobs.none? { |j| j.status == completed_status_value }
     i = 0
     max_retries = 10
     while i < max_retries && downloadstation.jobs.none? { |j| j.status == completed_status_value } do
