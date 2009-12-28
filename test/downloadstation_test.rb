@@ -109,17 +109,16 @@ class DownloadStationTest < Test::Unit::TestCase
   
   def test_clear
     downloadstation = get_downloadstation()
-    completed_status_value = 5
     
-    downloadstation.add_url(@small_file_url) if downloadstation.jobs.none? { |j| j.status == completed_status_value }
+    downloadstation.add_url(@small_file_url) if downloadstation.jobs.none? { |j| j.status == :COMPLETED }
     i = 0
     max_retries = 10
-    while i < max_retries && downloadstation.jobs.none? { |j| j.status == completed_status_value } do
+    while i < max_retries && downloadstation.jobs.none? { |j| j.status == :COMPLETED } do
       Kernel.sleep 3
       i = i + 1
     end
     
-    raise 'Can''t complete a download' if i == max_retries
+    raise 'Can\'t complete a download' if i == max_retries
     
     before = downloadstation.jobs
     
@@ -130,8 +129,24 @@ class DownloadStationTest < Test::Unit::TestCase
     after = downloadstation.jobs
     
     assert(after.count < before.count)
-    assert(before.any? { |j| j.status == completed_status_value })
-    assert(after.none? { |j| j.status == completed_status_value })
+    assert(before.any? { |j| j.status == :COMPLETED })
+    assert(after.none? { |j| j.status == :COMPLETED })
+  end
+  
+  def test_download_status_enum
+    quxValue = -69
+    quuxValue = 666
+    
+    assert_nothing_thrown {
+      DownloadStatus.add_item(:QUX, quxValue)
+      DownloadStatus.add_item(:QUUX, quuxValue)
+    }
+    
+    assert_equal(quxValue, DownloadStatus::QUX)
+    assert_equal(:QUUX, DownloadStatus.key(quuxValue))
+    
+    assert_nil(DownloadStatus::CORGE)
+    assert_nil(DownloadStatus.key(667))
   end
   
 end

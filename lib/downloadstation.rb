@@ -49,15 +49,51 @@ module SynologyApi
       
       # FIXME
       def method_missing(name, *args, &block)
-        if @data && @data.has_key?(name.to_s)
+        if @data.has_key?(name.to_s)
           @data[name.to_s]
         else
           super
         end
       end
       
+      def status
+        return nil unless @data.has_key?('status')
+        
+        DownloadStatus.key(@data['status'])
+      end
+      
     end
-  
+    
+    class DownloadStatus
+      
+      def DownloadStatus.add_item(key, value)
+        @hash ||= {}
+        @hash[key] = value
+      end
+
+      def DownloadStatus.const_missing(key)
+        @hash[key]
+      end
+      
+      def DownloadStatus.key(value)
+        @hash.index(value)
+      end
+
+      DownloadStatus.add_item :NEW, -1
+      DownloadStatus.add_item :UNKNOWN, 0
+      DownloadStatus.add_item :WAITING, 1
+      DownloadStatus.add_item :DOWNLOADING, 2
+      DownloadStatus.add_item :PAUSED, 3
+      DownloadStatus.add_item :COMPLETED, 5
+      DownloadStatus.add_item :CHECKING, 6
+      DownloadStatus.add_item :SEEDING, 8
+      DownloadStatus.add_item :ERROR, 101
+      DownloadStatus.add_item :BROKENLINK, 102
+      DownloadStatus.add_item :DOWNLOADFOLDERNOTFOUND, 103
+      DownloadStatus.add_item :NOACCESSTODOWNLOADFOLDER, 104
+      
+    end
+    
     class DownloadStationError < SynologyApiError; end
   
   end
