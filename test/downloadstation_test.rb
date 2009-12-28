@@ -178,4 +178,35 @@ class DownloadStationTest < Test::Unit::TestCase
     assert(downloadstation.jobs.none? { |j| j.url == @large_file_url })
   end
   
+  def test_stop_and_resume_job
+    downloadstation = get_downloadstation()
+    
+    downloadstation.jobs.select { |j| j.url == @large_file_url }.each { |j| j.delete }
+    downloadstation.add_url(@large_file_url)
+    
+    job = downloadstation.jobs.find { |j| j.url == @large_file_url }
+    assert_not_nil(job)
+    
+    assert_nothing_thrown {
+      job.stop
+    }
+    
+    job = downloadstation.jobs.find { |j| j.url == @large_file_url }
+    assert_not_nil(job)
+    
+    assert(job.status == :PAUSED)
+    
+    assert_nothing_thrown {
+      job.resume
+    }
+    
+    job = downloadstation.jobs.find { |j| j.url == @large_file_url }
+    assert_not_nil(job)
+    
+    assert(job.status != :PAUSED)
+    
+    # Cleaning
+    job.delete
+  end
+  
 end

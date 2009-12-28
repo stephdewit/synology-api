@@ -80,6 +80,14 @@ module SynologyApi
         connection.send('action' => 'delete', 'idList' => id.to_s) # ID separator is ':'
       end
       
+      def stop
+        connection.send('action' => 'stop', 'idList' => id.to_s) # ID separator is ':'
+      end
+      
+      def resume
+        connection.send('action' => 'resume', 'idList' => id.to_s) # ID separator is ':'
+      end
+      
     end
     
     class DownloadStatus
