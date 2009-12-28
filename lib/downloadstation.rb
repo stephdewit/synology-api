@@ -10,12 +10,14 @@ module SynologyApi
       def initialize(address, port, user, password)
         @connection = Connection.new(address, port, user, password)
       end
+      
+      attr_reader :connection
     
       def jobs
         response = @connection.send('action' => 'getall')
         
         if response && response['items']
-          response['items'].map { |j| Job.new(j) }
+          response['items'].map { |j| Job.new(j, self) }
         else
           []
         end
@@ -39,12 +41,20 @@ module SynologyApi
     
     class Job
       
-      def initialize(data)
+      def initialize(data, downloadstation)
         raise ArgumentError.new("Not nil 'data' argument expected") if data == nil
         raise TypeError.new("Hash 'data' argument expected") if not data.is_a? Hash
         raise ArgumentError.new("Not empty 'data' argument expected") if data.empty?
         
+        raise ArgumentError.new("Not nil 'downloadstation' argument expected") if downloadstation == nil
+        raise TypeError.new("DownloadStation 'downloadstation' argument expected") if not downloadstation.is_a? DownloadStation
+        
         @data = data
+        @downloadstation = downloadstation
+      end
+      
+      def connection
+        @downloadstation.connection
       end
       
       # FIXME
@@ -60,6 +70,14 @@ module SynologyApi
         return nil unless @data.has_key?('status')
         
         DownloadStatus.key(@data['status'])
+      end
+      
+      def id
+        @data['id']
+      end
+      
+      def delete
+        connection.send('action' => 'delete', 'idList' => id.to_s) # ID separator is ':'
       end
       
     end

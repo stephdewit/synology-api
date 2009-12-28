@@ -29,7 +29,7 @@ class DownloadStationTest < Test::Unit::TestCase
     qux_value = 'quux'
     corge_value = 'grault'
     assert_nothing_thrown {
-      job = Job.new({'qux' => qux_value, 'corge' => corge_value})
+      job = Job.new({'qux' => qux_value, 'corge' => corge_value}, get_downloadstation())
     }
     
     assert_not_nil(job)
@@ -43,19 +43,31 @@ class DownloadStationTest < Test::Unit::TestCase
   
   def test_initialize_job_with_nil_data
     assert_raise(ArgumentError) {
-      Job.new(nil)
+      Job.new(nil, get_downloadstation())
     }
   end
   
   def test_initialize_job_with_not_hash_data
     assert_raise(TypeError) {
-      Job.new('baz')
+      Job.new('baz', get_downloadstation())
     }
   end
   
   def test_initialize_job_with_empty_data
     assert_raise(ArgumentError) {
-      Job.new({})
+      Job.new({}, get_downloadstation())
+    }
+  end
+  
+  def test_initialize_job_with_nil_downloadstation
+    assert_raise(ArgumentError) {
+      Job.new({ 'grault' => 'garply' }, nil)
+    }
+  end
+  
+  def test_initialize_job_with_not_right_typed_downloadstation
+    assert_raise(TypeError) {
+      Job.new({ 'waldo' => 'fred' }, 69)
     }
   end
   
@@ -147,6 +159,23 @@ class DownloadStationTest < Test::Unit::TestCase
     
     assert_nil(DownloadStatus::CORGE)
     assert_nil(DownloadStatus.key(667))
+  end
+  
+  def test_delete_job
+    downloadstation = get_downloadstation()
+    
+    downloadstation.jobs.select { |j| j.url == @large_file_url }.each { |j| j.delete }
+    downloadstation.add_url(@large_file_url)
+    
+    job = downloadstation.jobs.find { |j| j.url == @large_file_url }
+    
+    assert_not_nil(job)
+    
+    assert_nothing_thrown {
+      job.delete
+    }
+    
+    assert(downloadstation.jobs.none? { |j| j.url == @large_file_url })
   end
   
 end
