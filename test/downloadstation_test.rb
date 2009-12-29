@@ -84,7 +84,7 @@ class DownloadStationTest < Test::Unit::TestCase
   def test_create_job_by_url
     downloadstation = get_downloadstation()
     assert_nothing_thrown {
-      downloadstation.add_url(@small_file_url)
+      downloadstation.create_job(@small_file_url)
     }
     
     assert(downloadstation.jobs.any? { |j| j.url == @small_file_url})
@@ -93,7 +93,7 @@ class DownloadStationTest < Test::Unit::TestCase
   def test_create_job_with_dirty_url
     downloadstation = get_downloadstation()
     assert_nothing_thrown {
-      job = downloadstation.add_url("  \n\r#{@small_file_url}\t\t\n")
+      job = downloadstation.create_job("  \n\r#{@small_file_url}\t\t\n")
     }
     
     assert(downloadstation.jobs.any? { |j| j.url == @small_file_url})
@@ -101,28 +101,46 @@ class DownloadStationTest < Test::Unit::TestCase
   
   def test_create_job_with_nil_url
     assert_raise(ArgumentError) {
-      get_downloadstation().add_url(nil)
+      get_downloadstation().create_job(nil)
     }
   end
   
   def test_create_job_with_empty_url
     EMPTY_STRINGS.each { |s|
       assert_raise(ArgumentError) {
-        get_downloadstation().add_url(s)
+        get_downloadstation().create_job(s)
       }
     }
   end
   
   def test_create_job_with_not_string_url
     assert_raise(TypeError) {
-      get_downloadstation().add_url([])
+      get_downloadstation().create_job([])
     }
+  end
+  
+  def test_create_job_by_torrent_file
+    downloadstation = get_downloadstation()
+    
+    torrent_filename = File.basename(@torrent_path)
+    before = downloadstation.jobs.select { |j| j.url == torrent_filename}
+    
+    assert_nothing_thrown {
+      downloadstation.create_job(File.new(@torrent_path))
+    }
+    
+    after = downloadstation.jobs.select { |j| j.url == torrent_filename}
+    
+    assert(after.count > before.count)
+    
+    # Cleaning
+    after.each { |j| j.delete }
   end
   
   def test_clear
     downloadstation = get_downloadstation()
     
-    downloadstation.add_url(@small_file_url) if downloadstation.jobs.none? { |j| j.status == :COMPLETED }
+    downloadstation.create_job(@small_file_url) if downloadstation.jobs.none? { |j| j.status == :COMPLETED }
     i = 0
     max_retries = 10
     while i < max_retries && downloadstation.jobs.none? { |j| j.status == :COMPLETED } do
@@ -165,7 +183,7 @@ class DownloadStationTest < Test::Unit::TestCase
     downloadstation = get_downloadstation()
     
     downloadstation.jobs.select { |j| j.url == @large_file_url }.each { |j| j.delete }
-    downloadstation.add_url(@large_file_url)
+    downloadstation.create_job(@large_file_url)
     
     job = downloadstation.jobs.find { |j| j.url == @large_file_url }
     
@@ -182,7 +200,7 @@ class DownloadStationTest < Test::Unit::TestCase
     downloadstation = get_downloadstation()
     
     downloadstation.jobs.select { |j| j.url == @large_file_url }.each { |j| j.delete }
-    downloadstation.add_url(@large_file_url)
+    downloadstation.create_job(@large_file_url)
     
     job = downloadstation.jobs.find { |j| j.url == @large_file_url }
     assert_not_nil(job)

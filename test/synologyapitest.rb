@@ -15,6 +15,8 @@ module SynologyApiTest
     
     @small_file_url = settings['testurls']['smallfile']
     @large_file_url = settings['testurls']['largefile']
+    
+    @torrent_path = File.join(File.dirname(__FILE__), settings['torrentfilename'])
   end
   
 end

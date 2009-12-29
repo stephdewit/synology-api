@@ -124,7 +124,17 @@ module SynologyApi
     # Couldn't find a gem which handles multipart POSTs correctly
     # Why the hell can't Net::HTTP do that ??!?
     def send_data_with_curl(data)
-      `curl -F "id=#{@token}" -F "torrent=@#{file}" http://#{address}:#{port}#{DOWNLOADREDIRECTOR_PATH}`
+      id = data['id']
+      field, file = data.find { |k,v| v.is_a? File }
+      
+      path = nil
+      if (file != nil)
+        path = file.path
+      end
+      
+      raise ArgumentError('Very limited cURL support') if (id == nil || field == nil || path === nil)
+      
+      `curl --silent --show-error -F "id=#{id}" -F "#{field}=@#{path}" http://#{address}:#{port}#{DOWNLOADREDIRECTOR_PATH}`
     end
     
     private :send_data_with_curl

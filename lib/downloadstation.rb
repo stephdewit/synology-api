@@ -23,14 +23,21 @@ module SynologyApi
         end
       end
       
-      def add_url(url)
-        raise ArgumentError.new("Not nil 'url' argument expected") if url == nil
-        raise TypeError.new("String 'url' argument expected") if not url.is_a? String
+      def create_job(url_or_file)
+        raise ArgumentError.new("Not nil 'url_or_file' argument expected") if url_or_file == nil
         
-        cleaned_url = url.strip
-        raise ArgumentError.new("Not empty 'url' argument expected") if cleaned_url.empty?
+        if !url_or_file.is_a?(String) && !url_or_file.is_a?(File)
+          raise TypeError.new("String or File 'url_or_file' argument expected")
+        end
         
-        @connection.send('action' => 'addurl', 'url' => cleaned_url)
+        if (url_or_file.is_a? String)
+          cleaned_url = url_or_file.strip
+          raise ArgumentError.new("Not empty 'url' argument expected") if cleaned_url.empty?
+        
+          @connection.send('action' => 'addurl', 'url' => cleaned_url)
+        else
+          @connection.send('torrent' => url_or_file)
+        end
       end
       
       def clear

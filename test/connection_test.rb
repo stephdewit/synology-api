@@ -213,11 +213,5 @@ class ConnectionTest < Test::Unit::TestCase
     
     assert !connection.is_connected?
   end
-  
-  #def test_upload_torrent_file
-  #  assert_nothing_thrown {
-  #    get_connection().upload_torrent_file(File.join(File.dirname(__FILE__), 'debian-503-i386-businesscard.iso.torrent'))
-  #  }
-  #end
 
 end

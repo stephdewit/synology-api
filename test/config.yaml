@@ -7,3 +7,5 @@ password: apipasswd
 testurls:
     smallfile: http://www.google.com/favicon.ico
     largefile: http://cache.pack.google.com/edgedl/chrome/mac/googlechrome-4.0.249.30-beta.dmg
+
+torrentfilename: debian-503-i386-businesscard.iso.torrent
