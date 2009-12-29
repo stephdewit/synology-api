@@ -76,9 +76,27 @@ module SynologyApi
         data_to_add = {}
       end
       
-      request = Net::HTTP::Post.new(DOWNLOADREDIRECTOR_PATH)
-      request.set_form_data(data_to_add.merge(data))
+      data_to_send = data_to_add.merge(data)
       
+      response_body = nil
+      
+      if (data.values.none? { |v| v.is_a? File })
+        response_body = send_data_with_builtin_http(data_to_send)
+      else
+        response_body = send_data_with_curl(data_to_send)
+      end
+      
+      result = JSON.parse(response_body)
+      # TODO: be more specific
+      raise SynologyApiError.new('Something went wrong while processing query') unless result['success']
+      
+      result
+    end
+    
+    def send_data_with_builtin_http(data)
+      request = Net::HTTP::Post.new(DOWNLOADREDIRECTOR_PATH)
+      request.set_form_data(data)
+
       begin
         response = @http.start { |h| h.request(request) }
       rescue SocketError, Errno::ECONNREFUSED, Errno::ETIMEDOUT => x
@@ -96,30 +114,20 @@ module SynologyApi
           raise exception
         end
       end
-      
-      treat_response(response.body)
+
+      response.body
     end
+    
+    private :send_data_with_builtin_http
     
     # FIXME
     # Couldn't find a gem which handles multipart POSTs correctly
     # Why the hell can't Net::HTTP do that ??!?
-    def upload_torrent_file(file)
-      login if (!is_connected?)
-      
-      curl_stdout = `curl -F "id=#{@token}" -F "torrent=@#{file}" http://#{address}:#{port}#{DOWNLOADREDIRECTOR_PATH}`
-      
-      treat_response(curl_stdout)
+    def send_data_with_curl(data)
+      `curl -F "id=#{@token}" -F "torrent=@#{file}" http://#{address}:#{port}#{DOWNLOADREDIRECTOR_PATH}`
     end
     
-    def treat_response(response_body)
-      result = JSON.parse(response_body)
-      # TODO: be more specific
-      raise SynologyApiError.new('Something went wrong while processing query') unless result['success']
-      
-      result
-    end
-    
-    private :treat_response
+    private :send_data_with_curl
     
   end
   
