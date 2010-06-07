@@ -157,6 +157,10 @@ module SynologyApi
       end
     end
     
+    def to_s
+      "#{super.to_s} (#{possible_cause})"
+    end
+    
   end
   
   class HttpError < NetworkError
