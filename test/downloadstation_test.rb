@@ -78,7 +78,18 @@ class DownloadStationTest < Test::Unit::TestCase
     }
     
     assert_not_nil(jobs)
-    assert_kind_of(Array, jobs)
+    assert_kind_of(Jobs, jobs)
+  end
+  
+  def test_total_speed
+    jobs = nil
+    assert_nothing_thrown {
+      jobs = get_downloadstation().jobs
+    }
+    
+    assert_not_nil(jobs)
+    assert_kind_of(Fixnum, jobs.total_download_speed)
+    assert_kind_of(Fixnum, jobs.total_upload_speed)
   end
   
   def test_create_job_by_url

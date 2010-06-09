@@ -17,9 +17,11 @@ module SynologyApi
         response = @connection.send('action' => 'getall')
         
         if response && response['items']
-          response['items'].map { |j| Job.new(j, self) }
+          items = Jobs.new
+          response['items'].each { |j| items << Job.new(j, self) }
+          items
         else
-          []
+          Jobs.new
         end
       end
       
@@ -95,6 +97,16 @@ module SynologyApi
         connection.send('action' => 'resume', 'idList' => id.to_s) # ID separator is ':'
       end
       
+    end
+    
+    class Jobs < Array
+      def total_download_speed
+        inject(0) { |sum, j| sum + j.currentRate }
+      end
+      
+      def total_upload_speed
+        inject(0) { |sum, j| sum + j.uploadRate }
+      end
     end
     
     class DownloadStatus
